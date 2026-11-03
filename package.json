@@ -10,9 +10,5 @@
   },
   "devDependencies": {
     "vite": "^8.3.5"
-  },
-  "dependencies": {
-    "@fontsource/gaegu": "^5.3.0",
-    "@fontsource/jua": "^5.3.0"
   }
 }

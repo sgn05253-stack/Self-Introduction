@@ -1,23 +1,18 @@
-import '@fontsource/gaegu';
-import '@fontsource/jua';
+import '@fontsource/gowun-batang/400.css';
+import '@fontsource/gowun-batang/700.css';
+import 'pretendard/dist/web/static/pretendard.css';
 import './style.css';
 import { profileData } from './data/profileData.js';
-import {
-  renderMalpungiSvg,
-  renderVerticalNameTag,
-  renderBubbleBgSvg,
-  renderDoodleSvg,
-  renderChatterSticker,
-} from './components/stickers.js';
+import { renderHeroVennSvg, renderMiniVennSvg } from './components/vennDiagram.js';
 
 function renderApp() {
-  const { hero, philosophy, interests, projects, contact, chatterStickers } = profileData;
+  const { site, hero, philosophy, interests, projects, contact } = profileData;
 
-  const navButtonsHtml = hero.navButtons
+  const navLinksHtml = site.navItems
     .map(
-      (btn) => `
-      <a href="${btn.target}" class="sticker sticker-btn bg-${btn.color}" style="--rot: ${btn.rot};" data-bounce>
-        <span>${btn.label}</span>
+      (item) => `
+      <a href="${item.href}" class="nav-link">
+        <span class="nav-link-num">${item.num}</span>${item.label}
       </a>
     `
     )
@@ -26,15 +21,10 @@ function renderApp() {
   const philosophyHtml = philosophy
     .map(
       (item) => `
-      <article class="sticker philosophy-card" style="--rot: ${item.rot};" data-bounce>
-        ${renderBubbleBgSvg(item.shape, item.color)}
-        <div class="sticker-content">
-          <div class="phil-header">
-            <span class="phil-kaomoji">${item.kaomoji}</span>
-            <h3 class="phil-title">${item.title}</h3>
-          </div>
-          <p class="phil-desc">${item.description}</p>
-        </div>
+      <article class="philosophy-item reveal-block" data-bounce>
+        <span class="philosophy-num">${item.num}</span>
+        <h3 class="philosophy-title">${item.title}</h3>
+        <p class="philosophy-desc">${item.description}</p>
       </article>
     `
     )
@@ -43,14 +33,15 @@ function renderApp() {
   const interestsHtml = interests
     .map(
       (item) => `
-      <article class="sticker interest-sticker" style="--rot: ${item.rot};" data-bounce>
-        ${renderBubbleBgSvg(item.shape, item.color)}
-        <div class="sticker-content">
-          <span class="interest-kaomoji">${item.kaomoji}</span>
+      <li class="interest-row reveal-block" tabindex="0" data-bounce>
+        <div class="interest-main">
+          <span class="interest-venn-indicator" aria-hidden="true">
+            ${renderMiniVennSvg()}
+          </span>
           <h3 class="interest-title">${item.title}</h3>
-          <p class="interest-subtitle">${item.subtitle}</p>
         </div>
-      </article>
+        <span class="interest-note">${item.note}</span>
+      </li>
     `
     )
     .join('');
@@ -58,14 +49,13 @@ function renderApp() {
   const projectsHtml = projects
     .map(
       (proj) => `
-      <article class="sticker memo-card bg-${proj.color}" style="--rot: ${proj.rot};" data-bounce>
-        <div class="memo-tape bg-${proj.tapeColor}" aria-hidden="true"></div>
-        <span class="memo-tag">${proj.tag}</span>
-        <h3 class="memo-title">${proj.title}</h3>
-        <p class="memo-desc">${proj.description}</p>
-        <div class="memo-hole-line">
-          <a href="${proj.linkUrl}" class="memo-link">${proj.linkText}</a>
+      <article class="project-card reveal-block" data-bounce>
+        <div>
+          <span class="project-category">${proj.category}</span>
+          <h3 class="project-title">${proj.title}</h3>
+          <p class="project-desc">${proj.description}</p>
         </div>
+        <a href="${proj.linkHref}" class="project-link">${proj.linkLabel}</a>
       </article>
     `
     )
@@ -74,8 +64,8 @@ function renderApp() {
   const contactLinksHtml = contact.links
     .map(
       (link) => `
-      <li class="contact-link-item">
-        <a href="${link.url}">${link.label}</a>
+      <li>
+        <a href="${link.href}" class="draw-underline-link">${link.label}</a>
       </li>
     `
     )
@@ -83,252 +73,153 @@ function renderApp() {
 
   const appEl = document.querySelector('#app');
   appEl.innerHTML = `
-    <!-- 1. 첫 화면 (Hero) -->
-    <header class="hero-section" id="top">
-      <div class="interlude-row" style="margin-top: 0; margin-bottom: 18px;">
-        <div class="doodle" style="width: 44px; height: 44px; --rot: -12deg;" data-bounce>
-          ${renderDoodleSvg('sun', 'yellow')}
-        </div>
-        <div class="doodle" style="width: 56px; height: 40px; --rot: 6deg;" data-bounce>
-          ${renderDoodleSvg('cloud', 'sky')}
-        </div>
-        <div class="doodle" style="width: 38px; height: 38px; --rot: 15deg;" data-bounce>
-          ${renderDoodleSvg('sparkle', 'pink')}
-        </div>
-      </div>
-
-      <div class="hero-collage">
-        <!-- 세로 이름표 스티커 (글자마다 작은 하트) -->
-        ${renderVerticalNameTag(hero.nameChars)}
-
-        <!-- 큰 말풍선 한 줄 소개 -->
-        <div class="sticker hero-headline-bubble" style="--rot: 1.6deg;" data-bounce>
-          ${renderBubbleBgSvg('rect-tail-left', 'yellow')}
-          <div class="sticker-content">
-            <span class="role-badge-pill">${hero.roleBadge}</span>
-            <h1 class="hero-headline-text">${hero.headline}</h1>
-          </div>
-        </div>
-
-        <!-- 짧은 자기소개 스티커 -->
-        <div class="sticker hero-bio-sticker bg-green" style="--rot: -1.7deg;" data-bounce>
-          <p>${hero.shortBio}</p>
-        </div>
-
-        <!-- '나의 이야기' · '프로젝트' 이동 스티커 버튼 -->
-        <nav class="hero-nav-buttons" aria-label="주요 섹션 이동">
-          ${navButtonsHtml}
+    <!-- 상단 고정 얇은 메뉴바 (모바일에서는 이름만 표시) -->
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="#top" class="brand-name">${site.name}</a>
+        <nav class="site-nav" aria-label="섹션 탐색">
+          ${navLinksHtml}
         </nav>
-
-        <!-- 오리지널 마스코트 '말풍이' -->
-        <div class="sticker hero-mascot-wrap" style="--rot: 2.3deg;" data-bounce>
-          ${renderMalpungiSvg()}
-          <p class="mascot-caption">${hero.mascotCaption}</p>
-        </div>
       </div>
     </header>
 
-    <!-- 사이 장식 1 -->
-    <div class="interlude-row" aria-hidden="true">
-      <div class="doodle" style="width: 38px; height: 38px; --rot: -14deg;" data-bounce>
-        ${renderDoodleSvg('star', 'yellow')}
-      </div>
-      ${renderChatterSticker(chatterStickers[0])}
-      <div class="doodle" style="width: 36px; height: 36px; --rot: 12deg;" data-bounce>
-        ${renderDoodleSvg('heart', 'pink')}
-      </div>
-    </div>
+    <main class="page-container" id="top">
+      <!-- 1. 첫 화면 (화면 높이 가득) -->
+      <section class="hero-section" aria-label="소개 첫 화면">
+        <div class="hero-grid">
+          <div class="hero-text-col reveal-block" data-bounce>
+            <p class="hero-eyebrow">${hero.eyebrow}</p>
+            <h1 class="hero-headline">${hero.headline}</h1>
+            <p class="hero-name">${hero.name}</p>
+            <p class="hero-bio">${hero.bio}</p>
+            <div class="hero-actions">
+              <a href="${hero.primaryBtn.href}" class="btn btn-filled">${hero.primaryBtn.label}</a>
+              <a href="${hero.secondaryBtn.href}" class="btn btn-outline">${hero.secondaryBtn.label}</a>
+            </div>
+          </div>
 
-    <!-- 2. 교육 철학 -->
-    <section class="philosophy-section" id="story" aria-labelledby="title-philosophy">
-      <div class="section-header-wrap">
-        <div class="doodle" style="width: 34px; height: 34px; --rot: -10deg;" data-bounce>
-          ${renderDoodleSvg('sparkle', 'purple')}
+          <div class="hero-visual">
+            ${renderHeroVennSvg()}
+          </div>
         </div>
-        <h2 id="title-philosophy" class="sticker section-label-sticker bg-pink" style="--rot: -1.8deg;" data-bounce>
-          <span class="section-step-num">01</span>
-          <span>나의 교육 철학 (・ω・)</span>
-        </h2>
-        <div class="doodle" style="width: 52px; height: 36px; --rot: 8deg;" data-bounce>
-          ${renderDoodleSvg('cloud', 'sky')}
+      </section>
+
+      <!-- 2. 01 — 교육 철학 -->
+      <section class="section-block" id="philosophy" aria-labelledby="heading-philosophy">
+        <div class="section-heading-row reveal-block">
+          ${renderMiniVennSvg()}
+          <h2 id="heading-philosophy" class="section-label">01 — 교육 철학</h2>
         </div>
-      </div>
-
-      <div class="philosophy-scatter">
-        ${philosophyHtml}
-      </div>
-    </section>
-
-    <!-- 사이 장식 2 -->
-    <div class="interlude-row" aria-hidden="true">
-      <div class="doodle" style="width: 42px; height: 42px; --rot: 10deg;" data-bounce>
-        ${renderDoodleSvg('sun', 'yellow')}
-      </div>
-      ${renderChatterSticker(chatterStickers[1])}
-      <div class="doodle" style="width: 36px; height: 36px; --rot: -15deg;" data-bounce>
-        ${renderDoodleSvg('star', 'green')}
-      </div>
-    </div>
-
-    <!-- 3. 연구 관심사 -->
-    <section class="interests-section" id="interests" aria-labelledby="title-interests">
-      <div class="section-header-wrap">
-        <div class="doodle" style="width: 34px; height: 34px; --rot: 14deg;" data-bounce>
-          ${renderDoodleSvg('heart', 'pink')}
+        <div class="philosophy-grid">
+          ${philosophyHtml}
         </div>
-        <h2 id="title-interests" class="sticker section-label-sticker bg-purple" style="--rot: 2.1deg;" data-bounce>
-          <span class="section-step-num">02</span>
-          <span>연구 관심사 ٩(◕‿◕)۶</span>
-        </h2>
-        <div class="doodle" style="width: 36px; height: 36px; --rot: -12deg;" data-bounce>
-          ${renderDoodleSvg('sparkle', 'yellow')}
+      </section>
+
+      <!-- 3. 02 — 연구 관심사 -->
+      <section class="section-block" id="interests" aria-labelledby="heading-interests">
+        <div class="section-heading-row reveal-block">
+          ${renderMiniVennSvg()}
+          <h2 id="heading-interests" class="section-label">02 — 연구 관심사</h2>
         </div>
-      </div>
+        <ul class="interests-list">
+          ${interestsHtml}
+        </ul>
+      </section>
 
-      <div class="interests-scatter">
-        ${interestsHtml}
-      </div>
-    </section>
-
-    <!-- 사이 장식 3 -->
-    <div class="interlude-row" aria-hidden="true">
-      <div class="doodle" style="width: 54px; height: 38px; --rot: -8deg;" data-bounce>
-        ${renderDoodleSvg('cloud', 'purple')}
-      </div>
-      ${renderChatterSticker(chatterStickers[2])}
-      <div class="doodle" style="width: 36px; height: 36px; --rot: 18deg;" data-bounce>
-        ${renderDoodleSvg('sparkle', 'pink')}
-      </div>
-    </div>
-
-    <!-- 4. 수업·연구 프로젝트 -->
-    <section class="projects-section" id="projects" aria-labelledby="title-projects">
-      <div class="section-header-wrap">
-        <div class="doodle" style="width: 38px; height: 38px; --rot: -12deg;" data-bounce>
-          ${renderDoodleSvg('star', 'yellow')}
+      <!-- 4. 03 — 수업·연구 프로젝트 -->
+      <section class="section-block" id="projects" aria-labelledby="heading-projects">
+        <div class="section-heading-row reveal-block">
+          ${renderMiniVennSvg()}
+          <h2 id="heading-projects" class="section-label">03 — 수업·연구 프로젝트</h2>
         </div>
-        <h2 id="title-projects" class="sticker section-label-sticker bg-green" style="--rot: -1.5deg;" data-bounce>
-          <span class="section-step-num">03</span>
-          <span>수업·연구 프로젝트 메모장 (｡•̀ᴗ-)✧</span>
-        </h2>
-        <div class="doodle" style="width: 36px; height: 36px; --rot: 9deg;" data-bounce>
-          ${renderDoodleSvg('heart', 'pink')}
+        <div class="projects-grid">
+          ${projectsHtml}
         </div>
-      </div>
+      </section>
 
-      <div class="projects-grid">
-        ${projectsHtml}
-      </div>
-    </section>
-
-    <!-- 사이 장식 4 -->
-    <div class="interlude-row" aria-hidden="true">
-      <div class="doodle" style="width: 36px; height: 36px; --rot: -16deg;" data-bounce>
-        ${renderDoodleSvg('heart', 'pink')}
-      </div>
-      ${renderChatterSticker(chatterStickers[3])}
-      <div class="doodle" style="width: 42px; height: 42px; --rot: 11deg;" data-bounce>
-        ${renderDoodleSvg('sun', 'yellow')}
-      </div>
-    </div>
-
-    <!-- 5. 연락처 (생각 풍선) -->
-    <footer class="contact-section" id="contact" aria-labelledby="title-contact">
-      <div class="section-header-wrap" style="margin-bottom: 18px;">
-        <h2 id="title-contact" class="sticker section-label-sticker bg-sky" style="--rot: 1.7deg;" data-bounce>
-          <span class="section-step-num">04</span>
-          <span>연락처 & 반가운 연결 ☆</span>
-        </h2>
-      </div>
-
-      <div class="sticker thought-bubble-card" style="--rot: -1.4deg;" data-bounce>
-        ${renderBubbleBgSvg('thought-bubble', 'yellow')}
-        <div class="sticker-content">
-          <p class="contact-greeting">${contact.greeting}</p>
-          <a href="${contact.emailHref}" class="contact-email-pill">
-            <span class="contact-email-badge">${contact.emailLabel}</span>
-            <span>${contact.email}</span>
-          </a>
-          <ul class="contact-links-list">
-            ${contactLinksHtml}
-          </ul>
+      <!-- 5. 04 — 연락처 -->
+      <footer class="contact-section" id="contact" aria-labelledby="heading-contact">
+        <div class="section-heading-row reveal-block">
+          ${renderMiniVennSvg()}
+          <h2 id="heading-contact" class="section-label">04 — 연락처</h2>
         </div>
-      </div>
-
-      <p class="diary-footer-note">
-        ✿ 최효령의 민주시민교육 · AI융합교육 연구 다이어리 ✿
-      </p>
-    </footer>
+        <div class="reveal-block" data-bounce>
+          <p class="contact-heading">${contact.heading}</p>
+          <p class="contact-subtext">${contact.subtext}</p>
+          <div class="contact-details">
+            <a href="${contact.emailHref}" class="draw-underline-link contact-email-link">
+              ${contact.email}
+            </a>
+            <ul class="contact-links-row">
+              ${contactLinksHtml}
+            </ul>
+          </div>
+        </div>
+      </footer>
+    </main>
   `;
 }
 
 /**
- * 1) IntersectionObserver로 스크롤 시 스티커가 '톡' 붙듯 나타나는 효과
- * 2) 스크롤 내리고 올릴 때 요소들이 통통 살짝 바운스되는 스프링 인터랙티브 효과
+ * 스크롤 인터랙션 설정
+ * 1) IntersectionObserver로 각 블록이 아래에서 16px 부드럽게 떠오르며 등장
+ * 2) 스크롤 시 요소들이 살짝 바운스되는 인터랙티브 동작
+ * 3) prefers-reduced-motion 설정 시 모든 움직임 비활성화
  */
-function setupStickerInteractions() {
-  const stickers = Array.from(document.querySelectorAll('.sticker'));
+function setupMotion() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealBlocks = Array.from(document.querySelectorAll('.reveal-block'));
   const bounceTargets = Array.from(document.querySelectorAll('[data-bounce]'));
 
-  // 1. 화면 진입 시 '톡' 붙는 효과
+  if (prefersReducedMotion) {
+    revealBlocks.forEach((el) => el.classList.add('is-visible'));
+    return;
+  }
+
+  // 1. IntersectionObserver (16px 아래에서 부드럽게 떠오름)
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const delay = Number(entry.target.dataset.popDelay || 0);
-          setTimeout(() => {
-            entry.target.classList.add('is-visible');
-          }, delay);
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
         }
       });
     },
-    { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
+    { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
   );
 
-  stickers.forEach((el, index) => {
-    // 같은 줄/섹션의 스티커들이 순차적으로 '톡, 톡' 붙도록 미세 딜레이 부여
-    el.dataset.popDelay = String((index % 4) * 65);
-    observer.observe(el);
-  });
+  revealBlocks.forEach((el) => observer.observe(el));
 
-  // 2. 스크롤 내리면서 요소들이 살짝 바운스되는 스프링 물리 인터랙션
+  // 2. 스크롤 내리면서 요소들이 살짝 바운스되는 인터랙티브 동작
   let lastScrollY = window.scrollY;
   let velocity = 0;
   let displacement = 0;
   let rafId = null;
 
-  function updateSpringBounce() {
-    // 스프링 복원력(stiffness)과 감쇠(damping)로 쫀득한 바운스 구현
-    const springForce = -0.18 * displacement;
-    velocity = (velocity + springForce) * 0.76;
+  function updateSpring() {
+    const springForce = -0.16 * displacement;
+    velocity = (velocity + springForce) * 0.78;
     displacement += velocity;
 
     const vh = window.innerHeight;
 
     bounceTargets.forEach((el, idx) => {
+      if (!el.classList.contains('is-visible')) return;
       const rect = el.getBoundingClientRect();
-      // 현재 화면 안에 보이는 요소만 바운스 적용
-      if (rect.bottom < -60 || rect.top > vh + 60) return;
+      if (rect.bottom < -40 || rect.top > vh + 40) return;
 
-      // 요소마다 살짝 다른 위상과 탄성 계수를 주어 다꾸 스티커가 살아 움직이는 느낌 연출
-      const factor = (idx % 3 === 0 ? 1 : idx % 3 === 1 ? -0.75 : 0.85);
-      const offsetY = Math.max(-14, Math.min(14, displacement * factor));
-      const scaleDelta = 1 + Math.min(0.03, Math.abs(displacement) * 0.0018);
-
-      el.style.setProperty('--scroll-y', `${offsetY.toFixed(2)}px`);
-      el.style.setProperty('--scroll-scale', scaleDelta.toFixed(3));
+      const phase = idx % 2 === 0 ? 1 : 0.75;
+      const offsetY = Math.max(-8, Math.min(8, displacement * phase));
+      el.style.setProperty('--scroll-bounce-y', `${offsetY.toFixed(2)}px`);
     });
 
-    if (Math.abs(displacement) > 0.15 || Math.abs(velocity) > 0.15) {
-      rafId = requestAnimationFrame(updateSpringBounce);
+    if (Math.abs(displacement) > 0.1 || Math.abs(velocity) > 0.1) {
+      rafId = requestAnimationFrame(updateSpring);
     } else {
-      // 정지 시 원래 자리로 깔끔하게 복귀
       displacement = 0;
       velocity = 0;
-      bounceTargets.forEach((el) => {
-        el.style.setProperty('--scroll-y', '0px');
-        el.style.setProperty('--scroll-scale', '1');
-      });
+      bounceTargets.forEach((el) => el.style.setProperty('--scroll-bounce-y', '0px'));
       rafId = null;
     }
   }
@@ -340,12 +231,11 @@ function setupStickerInteractions() {
       const delta = currentY - lastScrollY;
       lastScrollY = currentY;
 
-      // 스크롤 속도에 비례해 바운스 충격량 추가 (과도한 튐 방지 캡 적용)
-      const impulse = Math.max(-16, Math.min(16, delta * 0.28));
-      velocity += impulse * 0.35;
+      const impulse = Math.max(-10, Math.min(10, delta * 0.2));
+      velocity += impulse * 0.3;
 
       if (!rafId) {
-        rafId = requestAnimationFrame(updateSpringBounce);
+        rafId = requestAnimationFrame(updateSpring);
       }
     },
     { passive: true }
@@ -353,4 +243,4 @@ function setupStickerInteractions() {
 }
 
 renderApp();
-setupStickerInteractions();
+setupMotion();
