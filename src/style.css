@@ -50,16 +50,39 @@ body {
 }
 
 /* 파스텔 단색 배경 유틸리티 */
-.bg-green { background-color: var(--pastel-green); }
-.bg-purple { background-color: var(--pastel-purple); }
-.bg-pink { background-color: var(--pastel-pink); }
-.bg-yellow { background-color: var(--pastel-yellow); }
-.bg-sky { background-color: var(--pastel-sky); }
-.bg-gray { background-color: var(--pastel-gray); }
-.bg-white { background-color: var(--pastel-white); }
+.bg-green {
+  background-color: var(--pastel-green);
+}
+
+.bg-purple {
+  background-color: var(--pastel-purple);
+}
+
+.bg-pink {
+  background-color: var(--pastel-pink);
+}
+
+.bg-yellow {
+  background-color: var(--pastel-yellow);
+}
+
+.bg-sky {
+  background-color: var(--pastel-sky);
+}
+
+.bg-gray {
+  background-color: var(--pastel-gray);
+}
+
+.bg-white {
+  background-color: var(--pastel-white);
+}
 
 /* 제목 폰트 공통 */
-h1, h2, h3, .title-font {
+h1,
+h2,
+h3,
+.title-font {
   font-family: var(--font-title);
   font-weight: 400;
   margin: 0;
@@ -559,9 +582,17 @@ p {
 }
 
 /* PC에서 메모지마다 높낮이 편차 부여 */
-.memo-card:nth-child(1) { margin-top: 6px; }
-.memo-card:nth-child(2) { margin-top: -12px; }
-.memo-card:nth-child(3) { margin-top: 10px; }
+.memo-card:nth-child(1) {
+  margin-top: 6px;
+}
+
+.memo-card:nth-child(2) {
+  margin-top: -12px;
+}
+
+.memo-card:nth-child(3) {
+  margin-top: 10px;
+}
 
 /* 상단 마스킹테이프 스티커 장식 */
 .memo-tape {
